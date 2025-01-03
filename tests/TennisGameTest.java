@@ -1,5 +1,7 @@
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Method;
+
 import org.junit.Test;
 
 public class TennisGameTest {
@@ -62,4 +64,125 @@ public class TennisGameTest {
 		// This statement should cause an exception
 		game.player1Scored();			
 	}		
+	
+	@Test (expected = TennisGameException.class)
+	public void testTennisGame_Player2WinsPointAfterGameEnded_ResultsException() throws TennisGameException {
+		//Arrange
+		TennisGame game = new TennisGame();
+		//Act
+		game.player2Scored();
+		game.player2Scored();
+		game.player2Scored();
+		game.player2Scored();
+		//Act
+		// This statement should cause an exception
+		game.player2Scored();			
+	}	
+	
+	@Test
+	public void testTennisGame_player1Wins() throws TennisGameException{
+		TennisGame game = new TennisGame();
+		//Act
+		game.player1Scored();
+		game.player1Scored();
+		game.player1Scored();
+		game.player1Scored();
+		
+		String score = game.getScore();
+		assertEquals("player1 wins", score);
+	}
+	
+	@Test
+	public void testTennisGame_player2Wins() throws TennisGameException{
+		TennisGame game = new TennisGame();
+		//Act
+		game.player2Scored();
+		game.player2Scored();
+		game.player2Scored();
+		game.player2Scored();
+		
+		String score = game.getScore();
+		assertEquals("player2 wins", score);
+	}
+	
+	@Test
+	public void testTennisGame_player1Advantage() throws TennisGameException{
+		TennisGame game = new TennisGame();
+		//Act
+		game.player1Scored();
+		game.player1Scored();
+		game.player1Scored();
+		
+		game.player2Scored();
+		game.player2Scored();
+		game.player2Scored();
+		
+		game.player1Scored();
+		
+		String score = game.getScore();
+		assertEquals("player1 has advantage", score);
+	}
+	
+	@Test
+	public void testTennisGame_player2Advantage() throws TennisGameException{
+		TennisGame game = new TennisGame();
+		//Act
+		game.player1Scored();
+		game.player1Scored();
+		game.player1Scored();
+		
+		game.player2Scored();
+		game.player2Scored();
+		game.player2Scored();
+		
+		game.player2Scored();
+		
+		String score = game.getScore();
+		assertEquals("player2 has advantage", score);
+	}
+	
+	@Test
+	public void testTennisGame_player1ScoresOnce() throws TennisGameException{
+		TennisGame game = new TennisGame();
+		//Act
+		game.player1Scored();
+		String score = game.getScore();
+		assertEquals("love - 15", score);
+	}
+	
+	@Test
+	public void testTennisGame_player1ScoresTwice() throws TennisGameException{
+		TennisGame game = new TennisGame();
+		//Act
+		game.player1Scored();
+		game.player1Scored();
+		String score = game.getScore();
+		assertEquals("love - 30", score);
+	}
+	
+	@Test
+    public void testGetScoreDirectly() throws Exception {
+        TennisGame game = new TennisGame();
+
+        // Use reflection to access the private method
+        Method getScoreMethod = TennisGame.class.getDeclaredMethod("getScore", int.class);
+        getScoreMethod.setAccessible(true);
+
+        // Test for points 0 (love)
+        assertEquals("love", getScoreMethod.invoke(game, 0));
+
+        // Test for points 1 (15)
+        assertEquals("15", getScoreMethod.invoke(game, 1));
+
+        // Test for points 2 (30)
+        assertEquals("30", getScoreMethod.invoke(game, 2));
+
+        // Test for points 3 (40)
+        assertEquals("40", getScoreMethod.invoke(game, 3));
+
+        // Test for points greater than 3 (still returns "40")
+        assertEquals("40", getScoreMethod.invoke(game, 4));
+        assertEquals("40", getScoreMethod.invoke(game, 5));
+    }
+	
 }
